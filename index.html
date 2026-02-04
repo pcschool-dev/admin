@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบรับสมัครนักเรียน @ โรงเรียนปากช่อง | 2569</title>
+    <title>ระบบการจัดการรับสมัครนักเรียน @ โรงเรียนปากช่อง | 2569</title>
     <link rel="icon" type="image/x-icon" href="Logo.png">
 	<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 <style>
@@ -35,10 +35,16 @@
 	<div style="display:none;" align="center" id="FBloading" >
 		<h4>โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>Please open in external browser.</h4>	    
     	</div> 
-	<div align="center" id="loading" >
-	    <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
-		
-	</div>
+	<div id="loading"
+	    style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
+	    <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie"
+	      background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay>
+	    </dotlottie-player>
+	
+	    <h4 class="fw-bold mb-3" style="text-align: center;">
+	      <span>กำลังตรวจสอบความปลอดภัย</span>
+	    </h4>
+	  </div>
 	
     <iframe style="display:none" id="link"  enctype="multipart/form-data" scrolling="auto"  src="https://script.google.com/macros/s/AKfycbw7TLw7htbd_iKHPxvqLtf-1vo7L0Y---_Tdt6tROnW3ii922avZLk9jPFy3nMa4Aj1IA/exec"></iframe>
 	
