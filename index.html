@@ -35,7 +35,7 @@
 </style>
 </head>
 <!-- <body>  -->
-<body onload="preLoading()">
+<body>
 	<div style="display:none;" align="center" id="FBloading" >
 		<h4>โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>Please open in external browser.</h4>	    
     	</div> 
@@ -100,6 +100,7 @@
             };
         } else {
             // กรณีเข้าหน้าแรกปกติ (โหลดแบบ No Cache)
+			preloader.style.display = 'block';
             link.src = getNoCacheUrl(baseAppScript);
             
             link.onload = function() {
