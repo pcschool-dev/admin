@@ -31,7 +31,20 @@
 		<h4>โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>Please open in external browser.</h4>	    
     </div> 
 	<div id="loading"
-	    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;">    
+	    <div id="loading" style="
+		    display: flex; 
+		    flex-direction: column; 
+		    align-items: center; 
+		    justify-content: center; 
+		    position: fixed; /* ยึดอยู่กับหน้าจอ */
+		    top: 0; 
+		    left: 0; 
+		    width: 100vw; /* เต็มความกว้างหน้าจอ */
+		    height: 100vh; /* เต็มความสูงหน้าจอ */
+		    background-color: #ffffff; /* ปรับสีพื้นหลังตามต้องการ */
+		    z-index: 9999; /* ให้อยู่ชั้นบนสุด */
+		    margin: 0;
+		">
 	    <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie"
 	      background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay>
 	    </dotlottie-player>
