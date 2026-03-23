@@ -98,15 +98,17 @@
             };
         }
 
-        function preLoading(){  
+        window.addEventListener('load', function() {
+	        const loader = document.getElementById('loading');
+	        
 	        // ทำให้ค่อยๆ จาง
-	        preloader.style.opacity = '0';
+	        loader.style.opacity = '0';
 	        
 	        // รอให้จางจนจบ (0.5 วินาที) แล้วค่อยลบ Element ออก
 	        setTimeout(() => {
-	            preloader.style.display = 'none';
+	            loader.style.display = 'none';
 	        }, 500);
-	    };
+	    });
     </script>
 </body>    
 </html>
