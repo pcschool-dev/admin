@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- ป้องกัน Browser จำหน้าเว็บนี้ -->
 	  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 	  <meta http-equiv="Pragma" content="no-cache">
 	  <meta http-equiv="Expires" content="0">
-    <title>ระบบการจัดการรับสมัครนักเรียน @ โรงเรียนปากช่อง | 2569</title>
-    <link rel="icon" type="image/x-icon" href="Logo.png">
+	<title>ระบบการจัดการรับสมัครนักเรียน @ โรงเรียนปากช่อง | 2569</title>
+	<link rel="icon" type="image/x-icon" href="Logo.png">
 	<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
-<style>
-	iframe {
-		position: absolute;
-		top: 0px;
-		left: 0px;
-		width: 100%;
-		height: 100%;
-		border:none;
-	} 
-	.loader { 
-	  margin: auto; 	  
-	}
-</style>
+	<style>
+		iframe {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			border:none;
+		} 
+		.loader { 
+		  margin: auto; 	  
+		}
+	</style>
 </head>
 <!-- <body>  -->
 <body>
 	<div style="display:none;" align="center" id="FBloading" >
 		<h4>โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>Please open in external browser.</h4>	    
     </div> 	
-	<div align="center" id="loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 9999; margin: 0;">
+	<div align="center" id="loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 9999; margin: 0; transition: opacity 0.5s ease-out;">
    	 	<dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie" 
 			background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay>
     	</dotlottie-player>
+		<h4 style="color: #333; font-family: 'Sarabun', sans-serif; font-weight: bold; margin-top: 20px;">
+        กำลังตรวจสอบความปลอดภัย
+    </h4>
 	</div>
 	
     <iframe style="display:none" id="link"  enctype="multipart/form-data" scrolling="auto"  src="https://script.google.com/macros/s/AKfycbwLDBuYEHp68WA-ZHXN619c293reRnolgx_fQYzU98sk0KYMlrwjgzUpi1wrfol6osv/exec"></iframe>
@@ -61,7 +64,7 @@
             preloader.style.display = 'none';
             FBloading.style.display = 'block';
             let countDownDate = new Date(Date.now() + 15000).getTime();   	
-            let x = setInterval(function(){
+            let x = setTimeout(function(){
                 let now = new Date().getTime();
                 let distance = countDownDate - now;                
                 let seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -71,7 +74,7 @@
                     clearInterval(x);
                     window.location.href = 'https://pcschool-dev.github.io/admin'
                 }  				
-            }, 1000);
+            }, 1000); // ทุก ๆ 1 วิ
         
         } else if(idApply){
             // กรณีมี ID สมัครเรียน (โหลดแบบ No Cache)
@@ -95,9 +98,15 @@
             };
         }
 
-        function preLoading(){
-            preloader.style.display = 'none';
-        };
+        function preLoading(){  
+	        // ทำให้ค่อยๆ จาง
+	        preloader.style.opacity = '0';
+	        
+	        // รอให้จางจนจบ (0.5 วินาที) แล้วค่อยลบ Element ออก
+	        setTimeout(() => {
+	            preloader.style.display = 'none';
+	        }, 500);
+	    };
     </script>
 </body>    
 </html>
