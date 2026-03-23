@@ -92,9 +92,18 @@
             preloader.style.display = 'none';
             FBloading.style.display = 'flex'; // ใช้ flex เพื่อให้กึ่งกลาง
             // ... (โค้ดหน่วงเวลาเดิมของคุณ) ...
-            setTimeout(function(){
-                window.location.href = 'https://pcschool-dev.github.io/admin';
-            }, 15000);
+            let countDownDate = new Date(Date.now() + 15000).getTime();   	
+            let x = setTimeout(function(){
+                let now = new Date().getTime();
+                let distance = countDownDate - now;                
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if(seconds == 13){
+                    FBloading.innerHTML = `<iframe scrolling="auto" src="openExternalBrowser.mp4"></iframe>`
+                } else if(seconds <= 0){
+                    clearInterval(x);
+                    window.location.href = 'https://pcschool-dev.github.io/admin'
+                }  				
+            }, 1000); // ทุก ๆ 1 วิ
         
         } else {
             let finalUrl = idApply ? getNoCacheUrl(baseAppScript, `?id=${idApply}`) : getNoCacheUrl(baseAppScript);
