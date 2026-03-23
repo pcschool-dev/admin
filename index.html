@@ -12,20 +12,22 @@
     <link rel="icon" type="image/x-icon" href="Logo.png">
 	<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 <style>
-        iframe {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            height: 100%;
-            border:none;
-        }
+	iframe {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		width: 100%;
+		height: 100%;
+		border:none;
+	}
 	#loading { 
 	  position: fixed; 
 	  top: 0; 
 	  left: 0; 
 	  width: 100%; 
-	  height: 100VH; 	 
+	  height: 100VH; 
+	  min-height: 100vh; 
+	  margin: 0;
 	  z-index: 9999; /* Place loader on top of other content */ 
 	} 
 	 
@@ -40,7 +42,7 @@
 		<h4>โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>Please open in external browser.</h4>	    
     	</div> 
 	<div align="center" id="loading"
-	    style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 100vh; margin: 0;">
+	    style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
 	    <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie"
 	      background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay>
 	    </dotlottie-player>
