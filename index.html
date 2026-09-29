@@ -96,7 +96,7 @@
             <div class="field">
                 <label for="lgPin">รหัส PIN</label>
                 <div class="pw">
-                    <input type="password" id="lgPin" name="password" autocomplete="current-password" inputmode="numeric" required>
+                    <input type="password" id="lgPin" name="pin" autocomplete="off" inputmode="numeric" pattern="[0-9]*" required>
                     <button type="button" class="eye" data-eye="lgPin" aria-label="แสดงรหัส">แสดง</button>
                 </div>
             </div>
@@ -254,6 +254,9 @@
                 }, MAX_WAIT_MS);
             }
 
+            // เลขไทย -> อารบิก ตัดช่องว่าง (แป้นพิมพ์ไทยบนมือถือ) — เซิร์ฟเวอร์ทำซ้ำอีกชั้น (pcCleanPin_)
+            const cleanPin = (v) => String(v || '').replace(/[๐-๙]/g, c => String(c.charCodeAt(0) - 0x0E50)).replace(/\s+/g, '');
+
             async function callServer(body) {
                 const res = await fetch(baseAppScript, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -262,7 +265,7 @@
 
             $('loginForm').addEventListener('submit', async (ev) => {
                 ev.preventDefault();
-                const username = $('lgUser').value.trim(), pin = $('lgPin').value;
+                const username = $('lgUser').value.trim(), pin = cleanPin($('lgPin').value);
                 if (!username || !pin) return showMsg('loginMsg', 'กรุณากรอกชื่อผู้ใช้และรหัส PIN');
                 const btn = $('lgGo'); btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; showMsg('loginMsg', '');
                 try {
@@ -281,7 +284,7 @@
 
             $('changeForm').addEventListener('submit', async (ev) => {
                 ev.preventDefault();
-                const a = $('chNew').value, b = $('chNew2').value;
+                const a = cleanPin($('chNew').value), b = cleanPin($('chNew2').value);
                 if (!/^\d{6,12}$/.test(a)) return showMsg('changeMsg', 'รหัส PIN ต้องเป็นตัวเลข 6–12 หลัก');
                 if (a !== b) return showMsg('changeMsg', 'ยืนยันรหัส PIN ไม่ตรงกัน');
                 const btn = $('chGo'); btn.disabled = true; btn.textContent = 'กำลังบันทึก…'; showMsg('changeMsg', '');
