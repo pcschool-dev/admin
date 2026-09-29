@@ -78,7 +78,11 @@
             return baseUrl + params + sep + "t=" + new Date().getTime();
         }
 
-        const baseAppScript = "https://script.google.com/macros/s/AKfycbwLDBuYEHp68WA-ZHXN619c293reRnolgx_fQYzU98sk0KYMlrwjgzUpi1wrfol6osv/exec";
+        /* ตั้งแต่ 29 ก.ย. 2569 ชี้ไปโปรเจกต์ standalone "ระบบแอดมินรับสมัคร 2570" (ไม่ผูกกับชีตแล้ว)
+           อัปเดตระบบให้แก้ deployment นี้เป็นเวอร์ชันใหม่ ห้ามสร้าง New deployment เพราะจะได้ /exec ใหม่
+           ถ้าต้องถอยกลับ ใช้ deployment เดิมของสคริปต์ที่ผูก V4Admin-Admission69:
+           https://script.google.com/macros/s/AKfycbwLDBuYEHp68WA-ZHXN619c293reRnolgx_fQYzU98sk0KYMlrwjgzUpi1wrfol6osv/exec */
+        const baseAppScript = "https://script.google.com/macros/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
 
         // ฟังก์ชันช่วยปิด Loading แบบนิ่มนวล
         function hideLoader() {
