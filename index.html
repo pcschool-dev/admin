@@ -9,38 +9,57 @@
     <meta http-equiv="Expires" content="0">
     <title>ระบบจัดการรับสมัครนักเรียน @ โรงเรียนปากช่อง</title>
     <link rel="icon" type="image/x-icon" href="Logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* ป้องกันการเลื่อนหน้าจอขณะโหลด */
+        :root {
+            --brand: #8a0a0a; --brand-2: #6f0808; --ink: #1c1917; --ink-3: #6b6360;
+            --line: #e7e5e4; --bg: #f2efed; --card: #ffffff; --bad: #b3261e; --bad-bg: #fcf1f0;
         }
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        } 
-        /* สร้าง Class ส่วนกลางสำหรับจัดกึ่งกลาง */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        body { font-family: 'Sarabun', sans-serif; background: #ffffff; color: var(--ink); }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         .full-screen-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #ffffff;
-            z-index: 9999;
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #ffffff; z-index: 9999; text-align: center;
         }
+
+        /* ฟอร์มเข้าสู่ระบบ / ตั้งรหัสใหม่ */
+        .auth { position: fixed; inset: 0; z-index: 9998; display: none; overflow-y: auto;
+            background: var(--bg); padding: 24px 16px; box-sizing: border-box; }
+        .auth.on { display: flex; align-items: center; justify-content: center; }
+        .auth-card { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--line);
+            border-radius: 20px; box-shadow: 0 16px 36px rgba(28, 25, 23, .10); padding: 28px 24px 22px; box-sizing: border-box; }
+        .auth-logo { width: 64px; height: 64px; display: block; margin: 0 auto 10px; object-fit: contain; }
+        .auth h1 { font-size: 1.25rem; margin: 0; text-align: center; color: var(--brand); }
+        .auth .sub { margin: 4px 0 20px; text-align: center; font-size: .9rem; color: var(--ink-3); line-height: 1.6; }
+        .auth label { display: block; font-size: .9rem; font-weight: 600; margin: 0 0 6px; }
+        .auth .field { margin-bottom: 14px; }
+        .auth .pw { position: relative; }
+        .auth input[type=text], .auth input[type=password] {
+            width: 100%; box-sizing: border-box; height: 46px; padding: 0 44px 0 14px; font: inherit; font-size: 1rem;
+            border: 1.5px solid #d3cfcd; border-radius: 12px; background: #fff; color: var(--ink); outline: none; }
+        .auth input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(138, 10, 10, .12); }
+        .auth .eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px;
+            border: 0; background: transparent; color: var(--ink-3); cursor: pointer; border-radius: 8px; font-size: .8rem; }
+        .auth .row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 16px; font-size: .9rem; }
+        .auth .row label { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-weight: 400; cursor: pointer; }
+        .auth .row input { width: 18px; height: 18px; accent-color: var(--brand); }
+        .auth button.go { width: 100%; height: 48px; border: 0; border-radius: 12px; background: var(--brand); color: #fff;
+            font: inherit; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+        .auth button.go:hover { background: var(--brand-2); }
+        .auth button.go:disabled { opacity: .6; cursor: progress; }
+        .auth .msg { display: none; margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; font-size: .9rem; line-height: 1.6;
+            background: var(--bad-bg); color: var(--bad); border: 1px solid #f1c9c5; }
+        .auth .msg.on { display: block; }
+        .auth .msg.ok { background: #eef8f1; color: #1d6b3a; border-color: #c4e6cf; }
+        .auth .help { margin: 16px 0 0; text-align: center; font-size: .85rem; color: var(--ink-3); line-height: 1.6; }
+        .auth .rules { margin: -6px 0 14px; padding-left: 18px; font-size: .82rem; color: var(--ink-3); line-height: 1.7; }
+        .auth .link { background: none; border: 0; color: var(--brand); font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; padding: 0; }
+        .retry { margin-top: 14px; padding: 8px 18px; border: 1.5px solid var(--brand); color: var(--brand); background: #fff;
+            border-radius: 999px; font: inherit; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -49,21 +68,73 @@
         <h4 style="font-family: 'Sarabun', sans-serif; line-height: 1.6;">
             โปรดเปิดด้วย เบราว์เซอร์ภายนอก <br>
             <span style="color: #666; font-size: 0.9em;">Please open in external browser.</span>
-        </h4>       
-    </div>  
+        </h4>
+    </div>
 
     <!-- หน้า Loading หลัก -->
     <div id="loading" class="full-screen-center" style="transition: opacity 0.5s ease-out;">
-        <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie" 
+        <dotlottie-player src="https://lottie.host/3924723b-b000-47d9-877a-48fc904e0c67/UiIOpIdURz.lottie"
             background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay>
         </dotlottie-player>
-        <h4 style="color: #333; font-family: 'Sarabun', sans-serif; font-weight: bold; margin-top: 20px;">
-            กำลังตรวจสอบความปลอดภัย
+        <h4 id="loadingText" style="color: #333; font-family: 'Sarabun', sans-serif; font-weight: bold; margin-top: 20px;">
+            กำลังเปิดระบบ…
         </h4>
     </div>
-    
-    <iframe style="display:none" id="link" enctype="multipart/form-data" scrolling="auto" src=""></iframe>
-    
+
+    <!-- เข้าสู่ระบบ -->
+    <div id="loginBox" class="auth" role="dialog" aria-labelledby="loginTitle">
+        <form class="auth-card" id="loginForm" autocomplete="on" novalidate>
+            <img class="auth-logo" src="Logo.png" alt="">
+            <h1 id="loginTitle">ระบบจัดการรับสมัครนักเรียน</h1>
+            <p class="sub">สำหรับเจ้าหน้าที่ · โรงเรียนปากช่อง</p>
+            <div class="msg" id="loginMsg" role="alert"></div>
+            <div class="field">
+                <label for="lgUser">ชื่อผู้ใช้</label>
+                <input type="text" id="lgUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false"
+                    placeholder="ชื่อผู้ใช้แบบระบบประเมินครู" required>
+            </div>
+            <div class="field">
+                <label for="lgPin">รหัส PIN</label>
+                <div class="pw">
+                    <input type="password" id="lgPin" name="password" autocomplete="current-password" inputmode="numeric" required>
+                    <button type="button" class="eye" data-eye="lgPin" aria-label="แสดงรหัส">แสดง</button>
+                </div>
+            </div>
+            <div class="row">
+                <label><input type="checkbox" id="lgRemember" checked> จดจำเครื่องนี้ 30 วัน</label>
+            </div>
+            <button type="submit" class="go" id="lgGo">เข้าสู่ระบบ</button>
+            <p class="help">ลืมรหัส PIN หรือยังไม่มีบัญชี<br>แจ้งผู้ดูแลระบบรับสมัคร (ระดับ S) ให้รีเซ็ตหรือเปิดใช้งาน</p>
+        </form>
+    </div>
+
+    <!-- ตั้งรหัส PIN ใหม่ (เข้าครั้งแรกด้วยรหัสเริ่มต้น) -->
+    <div id="changeBox" class="auth" role="dialog" aria-labelledby="changeTitle">
+        <form class="auth-card" id="changeForm" autocomplete="on" novalidate>
+            <img class="auth-logo" src="Logo.png" alt="">
+            <h1 id="changeTitle">ตั้งรหัส PIN ของตัวเอง</h1>
+            <p class="sub" id="changeSub">เข้าครั้งแรกด้วยรหัสเริ่มต้น ต้องตั้งรหัสใหม่ก่อนใช้งาน</p>
+            <div class="msg" id="changeMsg" role="alert"></div>
+            <input type="text" name="username" id="chUser" autocomplete="username" hidden>
+            <div class="field">
+                <label for="chNew">รหัส PIN ใหม่</label>
+                <div class="pw">
+                    <input type="password" id="chNew" autocomplete="new-password" inputmode="numeric" maxlength="12" required>
+                    <button type="button" class="eye" data-eye="chNew" aria-label="แสดงรหัส">แสดง</button>
+                </div>
+            </div>
+            <ul class="rules"><li>ตัวเลข 6–12 หลัก</li><li>ไม่ใช่รหัสเริ่มต้น เลขซ้ำ หรือเลขเรียง เช่น 111111 123456</li></ul>
+            <div class="field">
+                <label for="chNew2">ยืนยันรหัส PIN ใหม่</label>
+                <input type="password" id="chNew2" autocomplete="new-password" inputmode="numeric" maxlength="12" required>
+            </div>
+            <button type="submit" class="go" id="chGo">บันทึกและเข้าสู่ระบบ</button>
+            <p class="help"><button type="button" class="link" id="chBack">กลับไปหน้าเข้าสู่ระบบ</button></p>
+        </form>
+    </div>
+
+    <iframe style="display:none" id="link" title="ระบบจัดการรับสมัครนักเรียน" scrolling="auto" src=""></iframe>
+
     <script type="text/javascript">
         let preloader = document.getElementById("loading");
         let FBloading = document.getElementById("FBloading");
@@ -72,7 +143,7 @@
         let param = new URLSearchParams(idUID);
         let id = param.get('fbclid');
         let idApply = param.get('id');
-        
+
         function getNoCacheUrl(baseUrl, params = "") {
             let sep = baseUrl.includes('?') ? '&' : '?';
             return baseUrl + params + sep + "t=" + new Date().getTime();
@@ -80,10 +151,9 @@
 
         /* ตั้งแต่ 29 ก.ย. 2569 ชี้ไปโปรเจกต์ standalone "ระบบแอดมินรับสมัคร 2570" (ไม่ผูกกับชีตแล้ว)
            อัปเดตระบบให้แก้ deployment นี้เป็นเวอร์ชันใหม่ ห้ามสร้าง New deployment เพราะจะได้ /exec ใหม่
-           deployment เดิมของสคริปต์ที่ผูก V4Admin-Admission69 ปิดแล้ว (29 ก.ย. 2569)
-           หน้านี้ฝังระบบในกรอบถ้าเบราว์เซอร์ยอม ไม่ยอมก็เปิดเต็มหน้า (ดูด้านล่าง) */
-        /* แบบ /a/macros/pcschool.ac.th/ ให้ Google เลือกบัญชีของโรงเรียน เมื่อเครื่องล็อกอินไว้หลายบัญชี */
-        const baseAppScript = "https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
+           ระบบเปิดแบบนิรนาม ตัวตนมาจากชื่อผู้ใช้ + รหัส PIN ที่หน้านี้ส่งไปตรวจ (pinlogin.js ของระบบแอดมิน)
+           จึงใช้ลิงก์ /macros/s/ ธรรมดา ไม่ใช่ /a/macros/pcschool.ac.th/ ซึ่งพาไปหน้าล็อกอิน Google */
+        const baseAppScript = "https://script.google.com/macros/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
 
         // ฟังก์ชันช่วยปิด Loading แบบนิ่มนวล
         function hideLoader() {
@@ -92,66 +162,174 @@
                 preloader.style.display = 'none';
             }, 500);
         }
+        function showLoader(text) {
+            document.getElementById('loadingText').textContent = text || 'กำลังเปิดระบบ…';
+            preloader.style.display = 'flex';
+            preloader.style.opacity = '1';
+        }
 
         if(id){
             preloader.style.display = 'none';
             FBloading.style.display = 'flex'; // ใช้ flex เพื่อให้กึ่งกลาง
             // ... (โค้ดหน่วงเวลาเดิมของคุณ) ...
-            let countDownDate = new Date(Date.now() + 15000).getTime();   	
+            let countDownDate = new Date(Date.now() + 15000).getTime();
             let x = setTimeout(function(){
                 let now = new Date().getTime();
-                let distance = countDownDate - now;                
+                let distance = countDownDate - now;
                 let seconds = Math.floor((distance % (1000 * 60)) / 1000);
                 if(seconds == 13){
                     FBloading.innerHTML = `<iframe scrolling="auto" src="openExternalBrowser.mp4"></iframe>`
                 } else if(seconds <= 0){
                     clearInterval(x);
                     window.location.href = 'https://pcschool-dev.github.io/admin'
-                }  				
-            }, 1000); // ทุก ๆ 1 วิ
-        
-        } else {
-            /* ลองฝังในกรอบก่อน แถบที่อยู่จะยังเป็น pcschool-dev.github.io/admin
-               ระบบแอดมินเปิดให้เฉพาะบัญชีโรงเรียน ต้องใช้การล็อกอิน Google ซึ่งมือถือและ Safari
-               ไม่ส่งให้หน้าที่ฝังในกรอบของเว็บอื่น Google จึงตอบ 401 (ได้หน้า error ในกรอบ)
-               ระบบแอดมินส่งสัญญาณ { pc: 'admin-ready' } มาเมื่อเปิดขึ้นจริง (js.html ต้นไฟล์)
-               ได้สัญญาณ: แสดงกรอบ  ไม่ได้สัญญาณ: เปิดระบบเต็มหน้าแทน (ลิงก์จะเป็น script.google.com)
-               กรอบซ่อนอยู่ใต้หน้าโหลดจนกว่าจะได้สัญญาณ ผู้ใช้จึงไม่เห็นหน้า 401 */
-            const finalUrl = idApply ? baseAppScript + '?id=' + encodeURIComponent(idApply) : baseAppScript;
-            const GRACE_AFTER_LOAD_MS = 6000;   // กรอบโหลดเสร็จแล้ว รอสัญญาณอีกเท่านี้
-            const MAX_WAIT_MS = 30000;          // กรอบไม่โหลดเลย (เน็ตช้า) รอสูงสุดเท่านี้
-            let ready = false, fallbackTimer = null;
-
-            function openFullPage() {
-                if (ready) return;
-                const h = document.querySelector('#loading h4');
-                if (h) h.innerHTML = 'กำลังไปที่ระบบอนุมัติ…<br><small style="font-weight:normal">ถ้าหน้าไม่เปลี่ยนเอง '
-                    + '<a href="' + finalUrl + '" target="_top" style="color:#8b1a1a">กดที่นี่</a></small>';
-                try {
-                    if (window.top !== window.self) window.top.location.replace(finalUrl);
-                    else window.location.replace(finalUrl);
-                } catch (e) {
-                    window.location.replace(finalUrl);
                 }
+            }, 1000); // ทุก ๆ 1 วิ
+
+        } else {
+            /* ลำดับการทำงาน
+               1) มีโทเคนที่ยังไม่หมดอายุในเครื่อง -> เปิดระบบในกรอบด้วย ?tk=
+               2) ไม่มี -> ฟอร์มเข้าสู่ระบบ ส่งไปตรวจที่ doPost ของระบบแอดมิน (fetch แบบ text/plain ไม่ต้อง preflight)
+               3) เข้าครั้งแรกด้วยรหัสเริ่มต้น -> ฟอร์มตั้งรหัสใหม่ก่อน
+               ระบบในกรอบส่งสัญญาณกลับมา: admin-ready (เปิดแล้ว) / admin-auth-fail (โทเคนหมดอายุ) / admin-logout
+               โทเคนเก็บที่หน้านี้ (โดเมน github.io ของเราเอง) ไม่ใช่ในกรอบ เพราะ Safari ลบ/แยกที่เก็บของกรอบฝัง */
+            const TK_KEY = 'pcAdminTk';
+            const MAX_WAIT_MS = 45000;
+            let ready = false, waitTimer = null, pendingTk = '', lastUser = '';
+
+            const $ = (i) => document.getElementById(i);
+            const store = {
+                get() { try { const o = JSON.parse(localStorage.getItem(TK_KEY) || 'null'); return o && o.t && o.x > Date.now() ? o : null; } catch (e) { return null; } },
+                set(t, x, remember) {
+                    const o = JSON.stringify({ t: t, x: x || (Date.now() + 12 * 3600000) });
+                    try { localStorage.removeItem(TK_KEY); sessionStorage.removeItem(TK_KEY); } catch (e) { }
+                    try { (remember ? localStorage : sessionStorage).setItem(TK_KEY, o); } catch (e) { }
+                    memTk = { t: t, x: x };
+                },
+                clear() { memTk = null; try { localStorage.removeItem(TK_KEY); sessionStorage.removeItem(TK_KEY); } catch (e) { } }
+            };
+            let memTk = null;
+            function currentTk() {
+                if (memTk && memTk.x > Date.now()) return memTk;
+                const a = store.get(); if (a) return a;
+                try { const o = JSON.parse(sessionStorage.getItem(TK_KEY) || 'null'); if (o && o.t && o.x > Date.now()) return o; } catch (e) { }
+                return null;
             }
+
+            function showMsg(box, text, ok) {
+                const m = $(box); m.textContent = text || ''; m.classList.toggle('on', !!text); m.classList.toggle('ok', !!ok);
+            }
+            function showLogin(msg) {
+                clearTimeout(waitTimer); ready = false;
+                link.style.display = 'none'; link.src = 'about:blank';
+                preloader.style.display = 'none';
+                $('changeBox').classList.remove('on');
+                $('loginBox').classList.add('on');
+                showMsg('loginMsg', msg || '');
+                $('lgPin').value = '';
+                setTimeout(() => ($('lgUser').value ? $('lgPin') : $('lgUser')).focus(), 50);
+            }
+            function showChange(msg) {
+                $('loginBox').classList.remove('on');
+                $('changeBox').classList.add('on');
+                $('chUser').value = lastUser;
+                $('chNew').value = ''; $('chNew2').value = '';
+                showMsg('changeMsg', msg || '');
+                setTimeout(() => $('chNew').focus(), 50);
+            }
+            function openSystem(tk) {
+                $('loginBox').classList.remove('on'); $('changeBox').classList.remove('on');
+                showLoader('กำลังเปิดระบบ…');
+                ready = false;
+                // getNoCacheUrl ตัดสินใจ ? หรือ & จาก baseUrl เท่านั้น ส่งพารามิเตอร์ต่อท้ายเองจะได้ ?tk=…?t=… (โทเคนเสีย)
+                let url = baseAppScript + '?tk=' + encodeURIComponent(tk) + '&t=' + Date.now();
+                if (idApply) url += '&id=' + encodeURIComponent(idApply);
+                link.src = url;
+                clearTimeout(waitTimer);
+                waitTimer = setTimeout(() => {
+                    if (ready) return;
+                    const h = $('loadingText');
+                    h.innerHTML = 'ระบบตอบช้ากว่าปกติ<br><small style="font-weight:normal">เน็ตช้าหรือระบบกำลังปรับปรุง</small>' +
+                        '<br><button class="retry" id="btnRetry" type="button">ลองใหม่</button>';
+                    $('btnRetry').onclick = () => { const c = currentTk(); c ? openSystem(c.t) : showLogin(); };
+                }, MAX_WAIT_MS);
+            }
+
+            async function callServer(body) {
+                const res = await fetch(baseAppScript, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            }
+
+            $('loginForm').addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const username = $('lgUser').value.trim(), pin = $('lgPin').value;
+                if (!username || !pin) return showMsg('loginMsg', 'กรุณากรอกชื่อผู้ใช้และรหัส PIN');
+                const btn = $('lgGo'); btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; showMsg('loginMsg', '');
+                try {
+                    const r = await callServer({ pc: 'login', username: username, pin: pin, remember: $('lgRemember').checked, ua: navigator.userAgent });
+                    if (!r || !r.ok) { showMsg('loginMsg', (r && r.message) || 'เข้าสู่ระบบไม่สำเร็จ'); $('lgPin').value = ''; $('lgPin').focus(); return; }
+                    lastUser = username;
+                    if (r.mustChangePin) { pendingTk = r.token; window._pcPin = pin; showChange(); return; }
+                    store.set(r.token, r.exp, $('lgRemember').checked);
+                    openSystem(r.token);
+                } catch (e) {
+                    showMsg('loginMsg', 'ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+                } finally {
+                    btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ';
+                }
+            });
+
+            $('changeForm').addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const a = $('chNew').value, b = $('chNew2').value;
+                if (!/^\d{6,12}$/.test(a)) return showMsg('changeMsg', 'รหัส PIN ต้องเป็นตัวเลข 6–12 หลัก');
+                if (a !== b) return showMsg('changeMsg', 'ยืนยันรหัส PIN ไม่ตรงกัน');
+                const btn = $('chGo'); btn.disabled = true; btn.textContent = 'กำลังบันทึก…'; showMsg('changeMsg', '');
+                try {
+                    const r = await callServer({ pc: 'changePin', token: pendingTk, pin: window._pcPin || '', newPin: a, remember: $('lgRemember').checked });
+                    if (!r || !r.ok) { showMsg('changeMsg', (r && r.message) || 'บันทึกไม่สำเร็จ'); return; }
+                    window._pcPin = ''; pendingTk = '';
+                    store.set(r.token, r.exp, $('lgRemember').checked);
+                    openSystem(r.token);
+                } catch (e) {
+                    showMsg('changeMsg', 'ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+                } finally {
+                    btn.disabled = false; btn.textContent = 'บันทึกและเข้าสู่ระบบ';
+                }
+            });
+            $('chBack').onclick = () => { window._pcPin = ''; pendingTk = ''; showLogin(); };
+
+            document.addEventListener('click', (ev) => {
+                const b = ev.target.closest && ev.target.closest('[data-eye]');
+                if (!b) return;
+                const inp = $(b.dataset.eye), show = inp.type === 'password';
+                inp.type = show ? 'text' : 'password';
+                b.textContent = show ? 'ซ่อน' : 'แสดง';
+                b.setAttribute('aria-label', show ? 'ซ่อนรหัส' : 'แสดงรหัส');
+            });
 
             window.addEventListener('message', function (ev) {
                 if (ev.source !== link.contentWindow && !String(ev.origin).endsWith('.googleusercontent.com')) return;
-                if (!ev.data || ev.data.pc !== 'admin-ready' || ready) return;
-                ready = true;
-                clearTimeout(fallbackTimer);
-                hideLoader();
-                link.style.display = 'block';
+                const kind = ev.data && ev.data.pc;
+                if (kind === 'admin-ready') {
+                    if (ready) return;
+                    ready = true;
+                    clearTimeout(waitTimer);
+                    hideLoader();
+                    link.style.display = 'block';
+                } else if (kind === 'admin-auth-fail') {
+                    store.clear();
+                    showLogin(ready ? 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่' : '');
+                } else if (kind === 'admin-logout') {
+                    store.clear();
+                    showLogin('ออกจากระบบแล้ว');
+                    $('loginMsg').classList.add('ok');
+                }
             });
 
-            link.onload = function () {
-                if (ready) return;
-                clearTimeout(fallbackTimer);
-                fallbackTimer = setTimeout(openFullPage, GRACE_AFTER_LOAD_MS);
-            };
-            fallbackTimer = setTimeout(openFullPage, MAX_WAIT_MS);
-            link.src = getNoCacheUrl(finalUrl);
+            const saved = currentTk();
+            if (saved) openSystem(saved.t); else showLogin();
         }
     </script>
-</body>    
+</body>
 </html>
