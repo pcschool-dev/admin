@@ -80,8 +80,10 @@
 
         /* ตั้งแต่ 29 ก.ย. 2569 ชี้ไปโปรเจกต์ standalone "ระบบแอดมินรับสมัคร 2570" (ไม่ผูกกับชีตแล้ว)
            อัปเดตระบบให้แก้ deployment นี้เป็นเวอร์ชันใหม่ ห้ามสร้าง New deployment เพราะจะได้ /exec ใหม่
-           deployment เดิมของสคริปต์ที่ผูก V4Admin-Admission69 ปิดแล้ว (29 ก.ย. 2569) */
-        const baseAppScript = "https://script.google.com/macros/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
+           deployment เดิมของสคริปต์ที่ผูก V4Admin-Admission69 ปิดแล้ว (29 ก.ย. 2569)
+           หน้านี้ส่งต่อไปเปิดระบบเต็มหน้า (ไม่ฝังใน iframe แล้ว ดูด้านล่าง) */
+        /* แบบ /a/macros/pcschool.ac.th/ ให้ Google เลือกบัญชีของโรงเรียน เมื่อเครื่องล็อกอินไว้หลายบัญชี */
+        const baseAppScript = "https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
 
         // ฟังก์ชันช่วยปิด Loading แบบนิ่มนวล
         function hideLoader() {
@@ -109,13 +111,20 @@
             }, 1000); // ทุก ๆ 1 วิ
         
         } else {
-            let finalUrl = idApply ? getNoCacheUrl(baseAppScript, `?id=${idApply}`) : getNoCacheUrl(baseAppScript);
-            link.src = finalUrl;
-            
-            link.onload = function() {
-                hideLoader();
-                link.style.display = 'block';
-            };
+            /* เปิดระบบเต็มหน้าแทนการฝังในกรอบ (iframe) ตั้งแต่ 29 ก.ย. 2569
+               ระบบแอดมินเปิดให้เฉพาะบัญชีโรงเรียน ต้องใช้การล็อกอิน Google
+               มือถือและ Safari ไม่ส่งการล็อกอินให้หน้าที่ฝังอยู่ในกรอบของเว็บอื่น Google จึงตอบ 401
+               ระบบรับสมัคร (regpc) เปิดให้ทุกคนโดยไม่ต้องล็อกอิน จึงยังฝังในกรอบได้ */
+            const finalUrl = idApply ? baseAppScript + '?id=' + encodeURIComponent(idApply) : baseAppScript;
+            const h = document.querySelector('#loading h4');
+            if (h) h.innerHTML = 'กำลังไปที่ระบบอนุมัติ…<br><small style="font-weight:normal">ถ้าหน้าไม่เปลี่ยนเอง '
+                + '<a href="' + finalUrl + '" target="_top" style="color:#8b1a1a">กดที่นี่</a></small>';
+            try {
+                if (window.top !== window.self) window.top.location.replace(finalUrl);
+                else window.location.replace(finalUrl);
+            } catch (e) {
+                window.location.replace(finalUrl);
+            }
         }
     </script>
 </body>    
