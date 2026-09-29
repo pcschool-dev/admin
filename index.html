@@ -58,6 +58,41 @@
         .auth .help { margin: 16px 0 0; text-align: center; font-size: .85rem; color: var(--ink-3); line-height: 1.6; }
         .auth .rules { margin: -6px 0 14px; padding-left: 18px; font-size: .82rem; color: var(--ink-3); line-height: 1.7; }
         .auth .link { background: none; border: 0; color: var(--brand); font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; padding: 0; }
+        /* ไอคอนในช่องกรอก */
+        .auth .inp { position: relative; }
+        .auth .inp .ico { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px;
+            fill: none; stroke: #a19a96; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        .auth .inp input { padding-left: 42px; }
+        .auth .inp:focus-within .ico { stroke: var(--brand); }
+        .auth input::placeholder { color: #b3aca8; }
+
+        /* หน้าตั้งรหัส: แถบขั้นตอน + ไอคอนกุญแจ + เงื่อนไขติ๊กเขียวสด */
+        .auth-card.is-change { border-top: 5px solid var(--brand); }
+        .steps { list-style: none; display: flex; align-items: center; gap: 8px; margin: 0 0 20px; padding: 0;
+            font-size: .82rem; color: var(--ink-3); justify-content: center; }
+        .steps li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .steps .bar { flex: 0 1 40px; height: 2px; background: var(--brand); border-radius: 2px; }
+        .steps .dot { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center;
+            font-size: .75rem; font-weight: 700; }
+        .steps .done { color: #1d6b3a; }
+        .steps .done .dot { background: #1d6b3a; }
+        .steps .done .dot svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .steps .now { color: var(--brand); font-weight: 700; }
+        .steps .now .dot { background: var(--brand); color: #fff; box-shadow: 0 0 0 4px rgba(138, 10, 10, .14); }
+        .badge-key { width: 68px; height: 68px; margin: 0 auto 12px; border-radius: 20px; display: grid; place-items: center;
+            background: linear-gradient(145deg, #a3171a, #6f0808); box-shadow: 0 10px 22px rgba(138, 10, 10, .28); }
+        .badge-key svg { width: 34px; height: 34px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .checks { list-style: none; margin: 2px 0 18px; padding: 12px 14px; border-radius: 12px; background: #faf8f7;
+            border: 1px solid var(--line); font-size: .86rem; display: grid; gap: 7px; }
+        .checks li { display: flex; align-items: center; gap: 9px; color: var(--ink-3); transition: color .15s; }
+        .checks .ck { width: 18px; height: 18px; flex: 0 0 18px; border-radius: 50%; border: 1.5px solid #cfc9c6;
+            display: grid; place-items: center; transition: background .15s, border-color .15s; }
+        .checks .ck svg { width: 11px; height: 11px; fill: none; stroke: transparent; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+        .checks li.ok { color: #1d6b3a; }
+        .checks li.ok .ck { background: #1d7a42; border-color: #1d7a42; }
+        .checks li.ok .ck svg { stroke: #fff; }
+        .checks li.bad { color: var(--bad); }
+        .checks li.bad .ck { border-color: var(--bad); }
         .retry { margin-top: 14px; padding: 8px 18px; border: 1.5px solid var(--brand); color: var(--brand); background: #fff;
             border-radius: 999px; font: inherit; cursor: pointer; }
     </style>
@@ -90,13 +125,15 @@
             <div class="msg" id="loginMsg" role="alert"></div>
             <div class="field">
                 <label for="lgUser">ชื่อผู้ใช้</label>
-                <input type="text" id="lgUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false"
-                    placeholder="ชื่อผู้ใช้แบบระบบประเมินครู" required>
+                <div class="inp"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.6-3.5 4.5-5 8-5s6.4 1.5 8 5"/></svg>
+                    <input type="text" id="lgUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false"
+                        placeholder="ชื่อผู้ใช้แบบระบบประเมินครู" required>
+                </div>
             </div>
             <div class="field">
                 <label for="lgPin">รหัส PIN</label>
-                <div class="pw">
-                    <input type="password" id="lgPin" name="pin" autocomplete="off" inputmode="numeric" pattern="[0-9]*" required>
+                <div class="inp pw"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <input type="password" id="lgPin" name="pin" autocomplete="off" inputmode="numeric" pattern="[0-9]*" placeholder="ตัวเลข" required>
                     <button type="button" class="eye" data-eye="lgPin" aria-label="แสดงรหัส">แสดง</button>
                 </div>
             </div>
@@ -108,28 +145,39 @@
         </form>
     </div>
 
-    <!-- ตั้งรหัส PIN ใหม่ (เข้าครั้งแรกด้วยรหัสเริ่มต้น) -->
+    <!-- ตั้งรหัส PIN ใหม่ (เข้าครั้งแรกด้วยรหัสเริ่มต้น) — หน้าตาต่างจากหน้าเข้าสู่ระบบชัด ๆ ผู้ใช้จะได้ไม่คิดว่าเด้งกลับมาหน้าเดิม -->
     <div id="changeBox" class="auth" role="dialog" aria-labelledby="changeTitle">
-        <form class="auth-card" id="changeForm" autocomplete="on" novalidate>
-            <img class="auth-logo" src="Logo.png" alt="">
-            <h1 id="changeTitle">ตั้งรหัส PIN ของตัวเอง</h1>
-            <p class="sub" id="changeSub">เข้าครั้งแรกด้วยรหัสเริ่มต้น ต้องตั้งรหัสใหม่ก่อนใช้งาน</p>
+        <form class="auth-card is-change" id="changeForm" autocomplete="on" novalidate>
+            <ol class="steps" aria-label="ขั้นตอน">
+                <li class="done"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4L19 7"/></svg></span>เข้าสู่ระบบ</li>
+                <li class="bar" aria-hidden="true"></li>
+                <li class="now" aria-current="step"><span class="dot">2</span>ตั้งรหัส PIN</li>
+            </ol>
+            <div class="badge-key"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l2.5 2.5M14 9l2 2"/></svg></div>
+            <h1 id="changeTitle">ตั้งรหัส PIN ของคุณ</h1>
+            <p class="sub" id="changeSub">เข้าสู่ระบบสำเร็จ · รหัสเริ่มต้นใช้ได้ครั้งเดียว<br>ตั้งรหัสที่จำได้เอง แล้วใช้รหัสนี้ทุกครั้งต่อจากนี้</p>
             <div class="msg" id="changeMsg" role="alert"></div>
             <input type="text" name="username" id="chUser" autocomplete="username" hidden>
             <div class="field">
                 <label for="chNew">รหัส PIN ใหม่</label>
-                <div class="pw">
-                    <input type="password" id="chNew" autocomplete="new-password" inputmode="numeric" maxlength="12" required>
+                <div class="inp pw"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <input type="password" id="chNew" autocomplete="new-password" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="ตัวเลข 6–12 หลัก" required>
                     <button type="button" class="eye" data-eye="chNew" aria-label="แสดงรหัส">แสดง</button>
                 </div>
             </div>
-            <ul class="rules"><li>ตัวเลข 6–12 หลัก</li><li>ไม่ใช่รหัสเริ่มต้น เลขซ้ำ หรือเลขเรียง เช่น 111111 123456</li></ul>
             <div class="field">
-                <label for="chNew2">ยืนยันรหัส PIN ใหม่</label>
-                <input type="password" id="chNew2" autocomplete="new-password" inputmode="numeric" maxlength="12" required>
+                <label for="chNew2">พิมพ์รหัส PIN ใหม่อีกครั้ง</label>
+                <div class="inp"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <input type="password" id="chNew2" autocomplete="new-password" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="พิมพ์ให้ตรงกับช่องบน" required>
+                </div>
             </div>
-            <button type="submit" class="go" id="chGo">บันทึกและเข้าสู่ระบบ</button>
-            <p class="help"><button type="button" class="link" id="chBack">กลับไปหน้าเข้าสู่ระบบ</button></p>
+            <ul class="checks" id="chChecks" aria-live="polite">
+                <li data-k="len"><span class="ck"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4L19 7"/></svg></span>ตัวเลข 6–12 หลัก</li>
+                <li data-k="easy"><span class="ck"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4L19 7"/></svg></span>ไม่ใช่เลขซ้ำหรือเลขเรียง เช่น 111111, 123456</li>
+                <li data-k="same"><span class="ck"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4L19 7"/></svg></span>สองช่องตรงกัน</li>
+            </ul>
+            <button type="submit" class="go" id="chGo" disabled>บันทึกรหัสและเข้าใช้งาน</button>
+            <p class="help"><button type="button" class="link" id="chBack">ยกเลิก กลับไปหน้าเข้าสู่ระบบ</button></p>
         </form>
     </div>
 
@@ -228,14 +276,30 @@
                 $('lgPin').value = '';
                 setTimeout(() => ($('lgUser').value ? $('lgPin') : $('lgUser')).focus(), 50);
             }
-            function showChange(msg) {
+            function showChange(msg, name) {
                 $('loginBox').classList.remove('on');
                 $('changeBox').classList.add('on');
                 $('chUser').value = lastUser;
                 $('chNew').value = ''; $('chNew2').value = '';
+                if (name) $('changeTitle').textContent = 'สวัสดี ' + name;
                 showMsg('changeMsg', msg || '');
+                checkPins();
                 setTimeout(() => $('chNew').focus(), 50);
             }
+            // เงื่อนไขเดียวกับเซิร์ฟเวอร์ (pcPinRuleError_) ยกเว้น "ไม่ใช่รหัสเริ่มต้น" ซึ่งหน้านี้ไม่รู้ เซิร์ฟเวอร์ตรวจให้
+            function checkPins() {
+                const a = cleanPin($('chNew').value), b = cleanPin($('chNew2').value);
+                const easy = !a || /^(\d)\1+$/.test(a) || '01234567890'.indexOf(a) > -1 || '09876543210'.indexOf(a) > -1;
+                const st = { len: /^\d{6,12}$/.test(a), easy: /^\d{6,12}$/.test(a) && !easy, same: !!b && a === b };
+                document.querySelectorAll('#chChecks li').forEach(li => {
+                    const k = li.dataset.k, typed = k === 'same' ? !!b : !!a;
+                    li.classList.toggle('ok', st[k]);
+                    li.classList.toggle('bad', typed && !st[k] && (k !== 'same' || b.length >= a.length));
+                });
+                $('chGo').disabled = !(st.len && st.easy && st.same);
+                return st;
+            }
+            ['chNew', 'chNew2'].forEach(i => $(i).addEventListener('input', checkPins));
             function openSystem(tk) {
                 $('loginBox').classList.remove('on'); $('changeBox').classList.remove('on');
                 showLoader('กำลังเปิดระบบ…');
@@ -272,7 +336,7 @@
                     const r = await callServer({ pc: 'login', username: username, pin: pin, remember: $('lgRemember').checked, ua: navigator.userAgent });
                     if (!r || !r.ok) { showMsg('loginMsg', (r && r.message) || 'เข้าสู่ระบบไม่สำเร็จ'); $('lgPin').value = ''; $('lgPin').focus(); return; }
                     lastUser = username;
-                    if (r.mustChangePin) { pendingTk = r.token; window._pcPin = pin; showChange(); return; }
+                    if (r.mustChangePin) { pendingTk = r.token; window._pcPin = pin; showChange('', r.name); return; }
                     store.set(r.token, r.exp, $('lgRemember').checked);
                     openSystem(r.token);
                 } catch (e) {
@@ -297,7 +361,7 @@
                 } catch (e) {
                     showMsg('changeMsg', 'ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
                 } finally {
-                    btn.disabled = false; btn.textContent = 'บันทึกและเข้าสู่ระบบ';
+                    btn.textContent = 'บันทึกรหัสและเข้าใช้งาน'; checkPins();
                 }
             });
             $('chBack').onclick = () => { window._pcPin = ''; pendingTk = ''; showLogin(); };
