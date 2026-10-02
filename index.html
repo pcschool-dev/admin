@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+    <!-- ปุ่มเข้าสู่ระบบด้วย Google (Google Identity Services) — ใช้ได้ทุกระบบใต้ pcschool-dev.github.io -->
+    <script src="https://accounts.google.com/gsi/client" async onload="window.pcGoogleReady && window.pcGoogleReady()"></script>
     <style>
         :root {
             --brand: #8a0a0a; --brand-2: #6f0808; --ink: #1c1917; --ink-3: #6b6360;
@@ -103,6 +105,12 @@
         .auth .msg .act { display: block; margin-top: 6px; }
         .auth .done { text-align: center; padding: 6px 0 4px; }
         .auth .done h1 { color: #1d6b3a; }
+        /* ปุ่ม Google + เส้นคั่น "หรือ" */
+        .gbox { min-height: 44px; display: flex; justify-content: center; margin: 0 0 6px; }
+        .gnote { margin: 0 0 4px; text-align: center; font-size: .82rem; color: var(--ink-3); }
+        .or { display: flex; align-items: center; gap: 10px; margin: 14px 0 16px; font-size: .82rem; color: var(--ink-3); }
+        .or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+        .auth .msg.info { background: #eef4fb; color: #24486d; border-color: #c9dbef; }
         .retry { margin-top: 14px; padding: 8px 18px; border: 1.5px solid var(--brand); color: var(--brand); background: #fff;
             border-radius: 999px; font: inherit; cursor: pointer; }
     </style>
@@ -133,6 +141,11 @@
             <h1 id="loginTitle">ระบบจัดการรับสมัครนักเรียน</h1>
             <p class="sub">สำหรับเจ้าหน้าที่ · โรงเรียนปากช่อง</p>
             <div class="msg" id="loginMsg" role="alert"></div>
+            <div id="gArea" hidden>
+                <div class="gbox" id="gBtn"></div>
+                <p class="gnote">ใช้บัญชี @pcschool.ac.th</p>
+                <div class="or">หรือใช้ชื่อผู้ใช้และรหัสผ่าน</div>
+            </div>
             <div class="field">
                 <label for="lgUser">ชื่อผู้ใช้</label>
                 <div class="inp"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.6-3.5 4.5-5 8-5s6.4 1.5 8 5"/></svg>
@@ -336,6 +349,12 @@
             const TK_KEY = 'pcAdminTk';
             const MAX_WAIT_MS = 45000;
             let ready = false, waitTimer = null, pendingTk = '', lastUser = '';
+            /* ปุ่ม Google (googlelogin.js ของระบบแอดมิน)
+               linkCred = Google ยืนยันแล้วแต่ยังไม่ผูกกับบัญชีในระบบ -> ฟอร์มรหัสผ่านถัดไปใช้ผูกครั้งเดียว
+               auto_select + prompt(): เคยกดปุ่มแล้ว เปิดระบบอื่นของโรงเรียนก็เข้าเองโดยไม่ต้องกดซ้ำ
+               ออกจากระบบแล้วปิด auto (disableAutoSelect) ไม่งั้นเด้งกลับเข้าทันที */
+            const GOOGLE_CLIENT_ID = '557466410691-3h5k0b5mdoan0p8ojrfbpvbs8icgi6q2.apps.googleusercontent.com';
+            let linkCred = '', gInit = false, gNoAuto = false;
 
             const $ = (i) => document.getElementById(i);
             const store = {
@@ -366,6 +385,9 @@
                 ['changeBox', 'forgotBox', 'requestBox'].forEach(b => $(b).classList.remove('on'));
                 $('loginBox').classList.add('on');
                 showMsg('loginMsg', msg || '');
+                $('loginMsg').classList.remove('info');
+                linkCred = ''; $('lgGo').textContent = 'เข้าสู่ระบบ';
+                renderGoogle();
                 $('lgPin').value = '';
                 setTimeout(() => ($('lgUser').value ? $('lgPin') : $('lgUser')).focus(), 50);
             }
@@ -433,24 +455,72 @@
                 if (!username || !pin) return showMsg('loginMsg', 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน');
                 const btn = $('lgGo'); btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; showMsg('loginMsg', '');
                 try {
-                    const r = await callServer({ pc: 'login', username: username, pin: pin, remember: $('lgRemember').checked, ua: navigator.userAgent });
+                    const r = linkCred
+                        ? await callServer({ pc: 'google', credential: linkCred, username: username, pin: pin, remember: $('lgRemember').checked })
+                        : await callServer({ pc: 'login', username: username, pin: pin, remember: $('lgRemember').checked, ua: navigator.userAgent });
                     if (!r || !r.ok) {
                         const m = (r && r.message) || 'เข้าสู่ระบบไม่สำเร็จ';
                         showMsg('loginMsg', m);
+                        $('loginMsg').classList.remove('info');
+                        if (linkCred) addUnlink();
                         if (/ยังไม่ได้เปิดใช้งาน|ยังไม่ได้รับสิทธิ์/.test(m)) $('loginMsg').insertAdjacentHTML('beforeend', '<button type="button" class="link act" data-go="request">ส่งคำขอเปิดใช้งาน</button>');
                         else if (/ไม่ถูกต้อง|ล็อก/.test(m)) $('loginMsg').insertAdjacentHTML('beforeend', '<button type="button" class="link act" data-go="forgot">ลืมรหัสผ่าน? ตั้งใหม่ทางอีเมล</button>');
                         $('lgPin').value = ''; $('lgPin').focus(); return;
                     }
-                    lastUser = username;
+                    lastUser = username; linkCred = '';
                     if (r.mustChangePin) { pendingTk = r.token; window._pcPin = pin; showChange('', r.name); return; }
                     store.set(r.token, r.exp, $('lgRemember').checked);
                     openSystem(r.token);
                 } catch (e) {
                     showMsg('loginMsg', 'ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
                 } finally {
-                    btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ';
+                    btn.disabled = false; btn.textContent = linkCred ? 'ผูกบัญชีและเข้าสู่ระบบ' : 'เข้าสู่ระบบ';
                 }
             });
+
+            async function onGoogle(resp) {
+                if (!resp || !resp.credential) return;
+                showMsg('loginMsg', 'กำลังตรวจสอบบัญชี Google…', true);
+                try {
+                    const r = await callServer({ pc: 'google', credential: resp.credential, remember: $('lgRemember').checked });
+                    if (r && r.ok) { linkCred = ''; store.set(r.token, r.exp, $('lgRemember').checked); openSystem(r.token); return; }
+                    if (r && r.needLink) { setLinkMode(resp.credential, r.message); return; }
+                    showLogin((r && r.message) || 'เข้าสู่ระบบด้วย Google ไม่สำเร็จ');
+                } catch (e) {
+                    showLogin('ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+                }
+            }
+            function setLinkMode(cred, msg) {
+                linkCred = cred;
+                $('loginBox').classList.add('on');
+                $('gArea').hidden = true;
+                $('lgGo').textContent = 'ผูกบัญชีและเข้าสู่ระบบ';
+                showMsg('loginMsg', msg);
+                $('loginMsg').classList.add('info');
+                addUnlink();
+                setTimeout(() => $('lgUser').focus(), 50);
+            }
+            function addUnlink() {
+                $('loginMsg').insertAdjacentHTML('beforeend', '<button type="button" class="link act" id="lgUnlink">ยกเลิก ใช้ชื่อผู้ใช้และรหัสผ่านตามปกติ</button>');
+                $('lgUnlink').onclick = () => { linkCred = ''; showLogin(); };
+            }
+            function initGoogle() {
+                if (gInit || !(window.google && google.accounts && google.accounts.id)) return;
+                gInit = true;
+                google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogle, auto_select: true,
+                    hd: 'pcschool.ac.th', context: 'signin', ux_mode: 'popup', use_fedcm_for_prompt: true, cancel_on_tap_outside: false });
+                renderGoogle();
+            }
+            function renderGoogle() {
+                if (!gInit || !$('loginBox').classList.contains('on') || linkCred) return;
+                $('gArea').hidden = false;
+                // วัดจากหน้าจอ ไม่ใช่การ์ด: ตอนสคริปต์ Google โหลดเสร็จการ์ดอาจยังไม่จัดหน้า (กว้าง 0) ปุ่มเลยเหลือ 200px
+                const w = Math.min(352, document.documentElement.clientWidth - 80);
+                google.accounts.id.renderButton($('gBtn'), { theme: 'outline', size: 'large', text: 'signin_with',
+                    shape: 'pill', width: Math.max(200, w), locale: 'th' });
+                if (!gNoAuto) google.accounts.id.prompt();
+            }
+            window.pcGoogleReady = initGoogle;
 
             $('changeForm').addEventListener('submit', async (ev) => {
                 ev.preventDefault();
@@ -591,6 +661,8 @@
                     showLogin(ready ? 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่' : '');
                 } else if (kind === 'admin-logout') {
                     store.clear();
+                    gNoAuto = true;
+                    try { google.accounts.id.disableAutoSelect(); } catch (e) { }
                     showLogin('ออกจากระบบแล้ว');
                     $('loginMsg').classList.add('ok');
                 }
@@ -598,6 +670,7 @@
 
             const saved = currentTk();
             if (saved) openSystem(saved.t); else showLogin();
+            initGoogle();   // สคริปต์ Google โหลดเสร็จก่อนถึงบรรทัดนี้ (แคช) — onload ของแท็กไม่เรียกซ้ำเพราะ gInit
         }
     </script>
 </body>
