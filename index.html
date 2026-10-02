@@ -111,6 +111,19 @@
         .or { display: flex; align-items: center; gap: 10px; margin: 14px 0 16px; font-size: .82rem; color: var(--ink-3); }
         .or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
         .auth .msg.info { background: #eef4fb; color: #24486d; border-color: #c9dbef; }
+        /* หน้ารอระหว่างตรวจบัญชี Google — ทับการ์ด กดซ้ำไม่ได้ (แบบเดียวกับระบบรับหนังสือ/ประเมินครู) */
+        .auth-card { position: relative; }
+        .g-wait { position: absolute; inset: 0; z-index: 5; border-radius: inherit; background: rgba(255, 255, 255, .97);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+        .g-wait-pic { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 14px rgba(28, 25, 23, .18); }
+        .g-wait-ico { display: grid; place-items: center; background: #fcf1f0; color: var(--brand); font-size: 30px; font-weight: 700; }
+        .g-wait-name { margin-top: 10px; font-weight: 700; }
+        .g-wait-mail { font-size: .88rem; color: var(--ink-3); }
+        .g-spin { width: 34px; height: 34px; margin: 18px 0; border: 3px solid #eadbd9; border-top-color: var(--brand);
+            border-radius: 50%; animation: gspin .8s linear infinite; }
+        @keyframes gspin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .g-spin { animation-duration: 2.4s; } }
+        .g-wait-msg { font-size: .95rem; color: var(--ink); min-height: 1.5em; }
         .retry { margin-top: 14px; padding: 8px 18px; border: 1.5px solid var(--brand); color: var(--brand); background: #fff;
             border-radius: 999px; font: inherit; cursor: pointer; }
     </style>
@@ -478,16 +491,60 @@
                 }
             });
 
+            /* หน้ารอ 2–5 วิระหว่างระบบตรวจกับ Google — เดิมมีแค่แถบข้อความ ครูคิดว่าค้างแล้วกดซ้ำ
+               ชื่อ/อีเมล/รูปถอดจาก ID token เพื่อแสดงเท่านั้น (เซิร์ฟเวอร์ให้ Google ตรวจจริง)
+               ข้อความเปลี่ยนตามเวลาที่รอ ไม่ใช่ผลจริง — ห้ามพูดว่าสำเร็จก่อนรู้ผล */
+            let gWaitTimers = [], gBusy = false;
+            function tokenInfo(cred) {
+                try {
+                    let b = String(cred).split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                    while (b.length % 4) b += '=';
+                    const p = JSON.parse(decodeURIComponent(atob(b).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+                    return { name: String(p.name || ''), email: String(p.email || ''),
+                        picture: /^https:\/\/[a-z0-9.-]+\.googleusercontent\.com\//.test(String(p.picture || '')) ? String(p.picture) : '' };
+                } catch (e) { return { name: '', email: '', picture: '' }; }
+            }
+            function showGoogleWait(cred) {
+                hideGoogleWait();
+                const p = tokenInfo(cred), w = document.createElement('div');
+                w.className = 'g-wait'; w.id = 'gWait'; w.setAttribute('role', 'status'); w.setAttribute('aria-live', 'polite');
+                w.innerHTML = (p.picture ? '<img class="g-wait-pic" alt="" referrerpolicy="no-referrer">' : '<div class="g-wait-pic g-wait-ico">G</div>') +
+                    '<div class="g-wait-name"></div><div class="g-wait-mail"></div><div class="g-spin" aria-hidden="true"></div>' +
+                    '<div class="g-wait-msg" id="gWaitMsg">กำลังยืนยันตัวตนกับ Google…</div>';
+                if (p.picture) { const im = w.querySelector('img'); im.src = p.picture; im.onerror = () => im.remove(); }
+                w.querySelector('.g-wait-name').textContent = p.name;   // ชื่อตั้งเองได้ ใส่ด้วย textContent เสมอ
+                w.querySelector('.g-wait-mail').textContent = p.email;
+                $('loginForm').appendChild(w);
+                [[2500, 'กำลังตรวจสิทธิ์และเตรียมข้อมูลของคุณ…'],
+                 [7000, 'ใช้เวลานานกว่าปกติเล็กน้อย กรุณารอสักครู่…'],
+                 [15000, 'อินเทอร์เน็ตอาจช้า ระบบยังทำงานอยู่ ไม่ต้องกดซ้ำ']].forEach(st =>
+                    gWaitTimers.push(setTimeout(() => { const m = $('gWaitMsg'); if (m) m.textContent = st[1]; }, st[0])));
+            }
+            function hideGoogleWait() {
+                gWaitTimers.forEach(clearTimeout); gWaitTimers = [];
+                const w = $('gWait'); if (w) w.remove();
+            }
             async function onGoogle(resp) {
-                if (!resp || !resp.credential) return;
-                showMsg('loginMsg', 'กำลังตรวจสอบบัญชี Google…', true);
+                if (!resp || !resp.credential || gBusy) return;
+                gBusy = true;
+                showMsg('loginMsg', '');
+                showGoogleWait(resp.credential);
                 try {
                     const r = await callServer({ pc: 'google', credential: resp.credential, remember: $('lgRemember').checked });
-                    if (r && r.ok) { linkCred = ''; store.set(r.token, r.exp, $('lgRemember').checked); openSystem(r.token); return; }
+                    if (r && r.ok) {
+                        const m = $('gWaitMsg'); if (m) m.textContent = 'กำลังเปิดระบบ…';
+                        linkCred = ''; store.set(r.token, r.exp, $('lgRemember').checked); openSystem(r.token);
+                        hideGoogleWait();   // openSystem ซ่อนการ์ดแล้วขึ้นหน้าโหลดของระบบต่อ — เก็บทิ้งไม่ให้ค้างตอนออกจากระบบ
+                        return;
+                    }
+                    hideGoogleWait();
                     if (r && r.needLink) { setLinkMode(resp.credential, r.message); return; }
                     showLogin((r && r.message) || 'เข้าสู่ระบบด้วย Google ไม่สำเร็จ');
                 } catch (e) {
+                    hideGoogleWait();
                     showLogin('ติดต่อระบบไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+                } finally {
+                    gBusy = false;
                 }
             }
             function setLinkMode(cred, msg) {
