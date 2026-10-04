@@ -467,6 +467,10 @@
                 if (gBusy) return;   // หน้ารอ Google บังแค่การคลิก กด Enter ในช่องกรอกยังส่งฟอร์มได้
                 const username = $('lgUser').value.trim(), pin = cleanPin($('lgPin').value);
                 if (!username || !pin) return showMsg('loginMsg', 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน');
+                // ID token ของ Google อายุราว 1 ชม. ทิ้งหน้าผูกบัญชีไว้นานแล้วค่อยกรอก เซิร์ฟเวอร์จะปฏิเสธ — ให้กด Google ใหม่แทน
+                const lx = linkCred ? tokenInfo(linkCred).exp : 0;   // อ่าน exp ไม่ได้ (0) = ปล่อยให้เซิร์ฟเวอร์ตัดสิน
+                if (lx && lx * 1000 < Date.now() + 60000)
+                    return showLogin('การยืนยันกับ Google หมดเวลาแล้ว กรุณากดปุ่ม Google อีกครั้ง');
                 const btn = $('lgGo'); btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; showMsg('loginMsg', '');
                 try {
                     const r = linkCred
@@ -501,9 +505,9 @@
                     let b = String(cred).split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
                     while (b.length % 4) b += '=';
                     const p = JSON.parse(decodeURIComponent(atob(b).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-                    return { name: String(p.name || ''), email: String(p.email || ''),
+                    return { name: String(p.name || ''), email: String(p.email || ''), exp: Number(p.exp) || 0,
                         picture: /^https:\/\/[a-z0-9.-]+\.googleusercontent\.com\//.test(String(p.picture || '')) ? String(p.picture) : '' };
-                } catch (e) { return { name: '', email: '', picture: '' }; }
+                } catch (e) { return { name: '', email: '', picture: '', exp: 0 }; }
             }
             function showGoogleWait(cred) {
                 hideGoogleWait();
