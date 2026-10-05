@@ -310,6 +310,10 @@
         let param = new URLSearchParams(idUID);
         let id = param.get('fbclid');
         let idApply = param.get('id');
+        /* สแกน QR ลงเวรที่จอผู้ดูแล (roster.js ของระบบแอดมิน) — ส่งต่อให้ระบบในกรอบหลังเข้าสู่ระบบ
+           ลบออกจากแถบที่อยู่ทันที รีเฟรชทีหลังจะได้ไม่ส่งรหัสที่หมดอายุไปซ้ำ */
+        let dutyCode = (param.get('duty') || '').replace(/[^0-9A-Za-z._-]/g, '').slice(0, 60);
+        if (dutyCode) { try { param.delete('duty'); history.replaceState(null, '', location.pathname + (param.toString() ? '?' + param : '') + location.hash); } catch (e) { } }
 
         function getNoCacheUrl(baseUrl, params = "") {
             let sep = baseUrl.includes('?') ? '&' : '?';
@@ -442,6 +446,7 @@
                 // getNoCacheUrl ตัดสินใจ ? หรือ & จาก baseUrl เท่านั้น ส่งพารามิเตอร์ต่อท้ายเองจะได้ ?tk=…?t=… (โทเคนเสีย)
                 let url = baseAppScript + '?tk=' + encodeURIComponent(tk) + '&t=' + Date.now();
                 if (idApply) url += '&id=' + encodeURIComponent(idApply);
+                if (dutyCode) url += '&duty=' + encodeURIComponent(dutyCode);   // ล้างเมื่อระบบเปิดสำเร็จ (admin-ready) โทเคนหมดอายุแล้วเข้าใหม่ยังส่งต่อได้
                 link.src = url;
                 clearTimeout(waitTimer);
                 waitTimer = setTimeout(() => {
@@ -727,6 +732,7 @@
                 if (!fromOurFrame(ev.source)) return;
                 const kind = ev.data && ev.data.pc;
                 if (kind === 'admin-ready') {
+                    dutyCode = '';
                     if (ready) return;
                     ready = true;
                     clearTimeout(waitTimer);
