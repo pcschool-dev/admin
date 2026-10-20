@@ -318,6 +318,9 @@
            ระบบเปิดแบบนิรนาม ตัวตนมาจากชื่อผู้ใช้ + รหัส PIN ที่หน้านี้ส่งไปตรวจ (pinlogin.js ของระบบแอดมิน)
            จึงใช้ลิงก์ /macros/s/ ธรรมดา ไม่ใช่ /a/macros/pcschool.ac.th/ ซึ่งพาไปหน้าล็อกอิน Google */
         const baseAppScript = "https://script.google.com/macros/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
+        /* กรอบระบบใช้ /a/macros/pcschool.ac.th/ (20 ต.ค. 69): เบราว์เซอร์ที่ล็อกอิน Google หลายบัญชี /macros/s/ ถูกพาไป /macros/u/N/ ของบัญชีที่ไม่มีสิทธิ์ ได้ 404
+           ส่วน fetch เข้าสู่ระบบ (doPost) ยังใช้ /macros/s/ ด้านบน ไม่มีคุกกี้ ไม่ต้องเลือกบัญชี */
+        const frameAppScript = "https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbzqNQTb1K5BgsHG9lme2uzDzdw2H6fxLe042twStbrLlQfOk7B5NwSjz4PjzOzNX_HUsg/exec";
 
         // ฟังก์ชันช่วยปิด Loading แบบนิ่มนวล
         function hideLoader() {
@@ -423,9 +426,7 @@
                 showLoader('กำลังเปิดระบบ…');
                 ready = false;
                 // getNoCacheUrl ตัดสินใจ ? หรือ & จาก baseUrl เท่านั้น ส่งพารามิเตอร์ต่อท้ายเองจะได้ ?tk=…?t=… (โทเคนเสีย)
-                /* authuser=0: เบราว์เซอร์ที่ล็อกอิน Google ไว้หลายบัญชี Google จะพากรอบไป /macros/u/N/ ของบัญชีที่ไม่มีสิทธิ์ ได้ 404 ค้าง "กำลังเปิดระบบ…"
-                   (ระบบเปิดแบบนิรนามอยู่แล้ว ไม่ได้ใช้บัญชี Google) บังคับใช้บัญชีแรกของเบราว์เซอร์ */
-                let url = baseAppScript + '?tk=' + encodeURIComponent(tk) + '&authuser=0&t=' + Date.now();
+                let url = frameAppScript + '?tk=' + encodeURIComponent(tk) + '&t=' + Date.now();
                 if (idApply) url += '&id=' + encodeURIComponent(idApply);
                 if (dutyCode) url += '&duty=' + encodeURIComponent(dutyCode);   // ล้างเมื่อระบบเปิดสำเร็จ (admin-ready) โทเคนหมดอายุแล้วเข้าใหม่ยังส่งต่อได้
                 link.src = url;
