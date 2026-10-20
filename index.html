@@ -343,7 +343,7 @@
                ระบบในกรอบส่งสัญญาณกลับมา: admin-ready (เปิดแล้ว) / admin-auth-fail (โทเคนหมดอายุ) / admin-logout
                โทเคนเก็บที่หน้านี้ (โดเมน github.io ของเราเอง) ไม่ใช่ในกรอบ เพราะ Safari ลบ/แยกที่เก็บของกรอบฝัง */
             const TK_KEY = 'pcAdminTk';
-            const MAX_WAIT_MS = 45000;
+            const MAX_WAIT_MS = 20000;   // เดิม 45 วิ: กรอบได้ 404 (หลายบัญชี) ผู้ใช้รอนานเกินไปกว่าจะเห็นคำแนะนำ
             let ready = false, waitTimer = null, pendingTk = '', pendingPin = '', lastUser = '';
             /* ปุ่ม Google (googlelogin.js ของระบบแอดมิน)
                linkCred = Google ยืนยันแล้วแต่ยังไม่ผูกกับบัญชีในระบบ -> ฟอร์มรหัสผ่านถัดไปใช้ผูกครั้งเดียว
@@ -423,7 +423,9 @@
                 showLoader('กำลังเปิดระบบ…');
                 ready = false;
                 // getNoCacheUrl ตัดสินใจ ? หรือ & จาก baseUrl เท่านั้น ส่งพารามิเตอร์ต่อท้ายเองจะได้ ?tk=…?t=… (โทเคนเสีย)
-                let url = baseAppScript + '?tk=' + encodeURIComponent(tk) + '&t=' + Date.now();
+                /* authuser=0: เบราว์เซอร์ที่ล็อกอิน Google ไว้หลายบัญชี Google จะพากรอบไป /macros/u/N/ ของบัญชีที่ไม่มีสิทธิ์ ได้ 404 ค้าง "กำลังเปิดระบบ…"
+                   (ระบบเปิดแบบนิรนามอยู่แล้ว ไม่ได้ใช้บัญชี Google) บังคับใช้บัญชีแรกของเบราว์เซอร์ */
+                let url = baseAppScript + '?tk=' + encodeURIComponent(tk) + '&authuser=0&t=' + Date.now();
                 if (idApply) url += '&id=' + encodeURIComponent(idApply);
                 if (dutyCode) url += '&duty=' + encodeURIComponent(dutyCode);   // ล้างเมื่อระบบเปิดสำเร็จ (admin-ready) โทเคนหมดอายุแล้วเข้าใหม่ยังส่งต่อได้
                 link.src = url;
@@ -431,7 +433,7 @@
                 waitTimer = setTimeout(() => {
                     if (ready) return;
                     const h = $('loadingText');
-                    h.innerHTML = 'ระบบตอบช้ากว่าปกติ<br><small style="font-weight:normal">เน็ตช้าหรือระบบกำลังปรับปรุง</small>' +
+                    h.innerHTML = 'ระบบตอบช้ากว่าปกติ<br><small style="font-weight:normal">เน็ตช้าหรือระบบกำลังปรับปรุง<br>ถ้าเบราว์เซอร์ล็อกอิน Google ไว้หลายบัญชี ลองเปิดในหน้าต่างไม่ระบุตัวตน (Incognito)<br>หรือออกจากบัญชี Google ที่ไม่ใช่ @pcschool.ac.th</small>' +
                         '<br><button class="retry" id="btnRetry" type="button">ลองใหม่</button>';
                     $('btnRetry').onclick = () => { const c = currentTk(); c ? openSystem(c.t) : showLogin(); };
                 }, MAX_WAIT_MS);
